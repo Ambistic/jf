@@ -16,6 +16,14 @@ class ObjDB(ABC):
         values = getattr(self, accessor)
         return {values[k]: k for k in self.index}
 
+    @lru_cache(maxsize=None)
+    def _toward(self, accessor):
+        if accessor == "index":
+            return {k: k for k in self.index}
+
+        values = getattr(self, accessor)
+        return {k: values[k] for k in self.index}
+
     @abstractmethod
     def __getattr__(self, attr):
         # the basic principle is that value[index] exists and is consistent

@@ -1,5 +1,39 @@
 import re
+from pathlib import Path as P
+import json
+from configparser import ConfigParser
 from jf.utils.helper import nonestr
+
+
+def _parse_substring(substring):
+    pat = '([\w\d]+)(?:{([\w\d]+)})?'
+    return re.findall(pat, substring)[0]
+
+
+def strip_param(param):
+    c = "'"
+    if param.startswith(c) and param.startswith(c):
+        return param.strip(c)
+    return param
+
+
+def cover_param(param):
+    if " " in param:
+        return f"'{param}'"
+    return param
+
+
+def read_model(name, dirname="."):
+    conf = ConfigParser()
+    conf.read(P(dirname) / "stringmodel.conf")
+    kwargs = dict(conf[name])
+    if "default" in kwargs:
+        kwargs["default"] = json.loads(kwargs["default"])
+
+    for k in ["sep", "escape", "forbidden", "replace"]:
+        kwargs[k] = strip_param(kwargs[k])
+    return StringModel(**kwargs)
+
 
 class StringModel:
     def __init__(self, model, default=dict(), global_default="", sep="_.", escape="$", forbidden="", replace="%"):
@@ -15,40 +49,69 @@ class StringModel:
         self.escape = escape
         self.forbidden = forbidden
         self.replace = replace
-        
+
+    def save(self, name, dirname="."):
+        conf = ConfigParser()
+        conf.read(P(dirname) / "stringmodel.conf")
+        kwargs = dict(
+            model=self.model,
+            default=json.dumps(self.default),
+            global_default=self.global_default,
+            sep=cover_param(self.sep),
+            escape=cover_param(self.escape),
+            forbidden=cover_param(self.forbidden),
+            replace=cover_param(self.replace),
+        )
+
+        conf[name] = {k: v.replace("%", "%%") for k, v in kwargs.items()}
+        # for k, v in kwargs.items():
+        #     conf[name][k] = v
+
+        with open(P(dirname) / "stringmodel.conf", "w") as fp:
+            conf.write(fp)
+
     def _split(self, string):
         pat = f"(?:^|([^{self.escape}]))[{self.sep}]"
         res = re.split(pat, string)
         size = int((len(res) + 1) / 2)
         res += ['']
         return [res[i * 2] + nonestr(res[i * 2 + 1]) for i in range(size)]
-    
-    def _parse_substring(self, substring):
-        pat ='([\w\d]+)(?:{([\w\d]+)})?'
-        return re.findall(pat, substring)[0]
-    
+
     def _get_slots(self):
         substrings = self._split(self.model)
-        return [self._parse_substring(substring) for substring in substrings]
-    
+        return [_parse_substring(substring) for substring in substrings]
+
     def _process_dict_strings(self, my_dict):
         for char in self.forbidden:
             for k, v in my_dict.items():
                 my_dict[k] = str(v).replace(char, self.replace)
         return my_dict
-    
+
     def fill(self, **params):
         params = self._process_dict_strings(params)
         values = {slotname: self.global_default for _, slotname in self._get_slots()}
         values.update(self.default)
         values.update(params)
         return self.model.format(**values)
-    
+
     def _extract_slot(self, string, prefix):
         pat = f"(?:^|[{self.sep}])({prefix}[^{self.sep}]*)(?:$|[{self.sep}])"
         return re.findall(pat, string)[0]
-    
+
     def extract(self, string):
+        slots = self._get_slots()
+        substrings = self._split(string)
+        assert len(slots) == len(substrings), f"Are you sure {string} matches the model"
+        dict_res = dict()
+        for (prefix, slotname), substring in zip(slots, substrings):
+            if slotname == "":
+                continue
+            if re.match(f"{prefix}.*", substring):
+                dict_res[slotname] = re.findall(f"{prefix}(.*)", substring)[0]
+
+        return dict_res
+
+    def extract_old(self, string):
         slots = filter(lambda x: x[1] != "", self._get_slots())
         substrings = self._split(string)
         dict_res = dict()
@@ -57,5 +120,10 @@ class StringModel:
                 if re.match(f"{prefix}.*", substring):
                     dict_res[slotname] = re.findall(f"{prefix}(.*)", substring)[0]
                     break
-        
+
         return dict_res
+    
+    def match(self, string):
+        slots = self._get_slots()
+        substrings = self._split(string)
+        return len(slots) == len(substrings)

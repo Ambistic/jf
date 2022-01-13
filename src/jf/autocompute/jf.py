@@ -3,15 +3,22 @@ from pathlib import Path
 import numpy as np
 import re
 
+
+ClassPath = type(Path())
+
+
 class _JFObject:
     pass
 
+
 _ls_funcs = []
+
 
 class ComputeNode:
     def __init__(self, name, builders=[]):
         self.name = name
         self.builders = builders
+
 
 class ComputeEdge:
     def __init__(self, name, func, needs=[], provides=[]):
@@ -22,7 +29,8 @@ class ComputeEdge:
         
     def get_nodes(self):
         return self.needs + self.provides
-        
+
+
 class ComputeGraph:
     def __init__(self):
         self.nodes = dict()
@@ -44,6 +52,10 @@ class ComputeGraph:
     def can_compute(self, name, knowing=dict()):
         if name in knowing:
             return True
+
+        if name not in self.nodes:
+            return False
+
         for builder in self.nodes[name].builders:
             ok = True
             for need in builder.needs:
@@ -78,9 +90,11 @@ class ComputeGraph:
         if not self.can_compute(name, knowing):
             raise ValueError(f"Could not find a way of computing {name}")
         return self._compute(name, knowing)
-    
+
+
 _COMPUTE_GRAPH = ComputeGraph()
-    
+
+
 def _register(func):
     # what if get multiple outputs ? 
     name = func.__name__
@@ -91,15 +105,18 @@ def _register(func):
     edge = ComputeEdge(name, func, params, [target])
     _COMPUTE_GRAPH.add_edge(edge)
 
+
 # decorator
 def register_func(func):
     if func.__name__.startswith("build_"):
         _register(func)
     return func
 
+
 def _get_func_params(func):
     s = signature(func)
     return [p.name for p in s.parameters.values() if p.default == _empty]
+
 
 class O(_JFObject):
     def __init__(self, **kwargs):
@@ -121,22 +138,25 @@ class O(_JFObject):
             setattr(self, attr, value)
             return value
 
+
 class L(list, _JFObject):
     pass
 
-class P(Path, _JFObject):
-    pass
+
+class P(ClassPath, _JFObject):
+    def __init__(self, *args, **kwargs):
+        ClassPath.__init__(self)
+
 
 class S(set, _JFObject):
     pass
+
 
 def A(*args):
     if len(args) > 1:
         return np.array(args)
     return np.array(*args)
 
+
 class T(tuple, _JFObject):
     pass
-
-def zipswap(ls):
-    return list(zip(*ls))
