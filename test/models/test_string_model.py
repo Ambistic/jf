@@ -1,5 +1,5 @@
 import pytest
-from jf.models.stringmodel import StringModel, read_model
+from jf.models.stringmodel import StringModel, read_model, _FILENAME_MODELS
 
 
 def test_load(tmpdir):
@@ -13,12 +13,14 @@ def test_load(tmpdir):
     forbidden= ' '
     replace=%%
     """
-    with open(tmpdir / "stringmodel.conf", "w") as f:
+    with open(tmpdir / _FILENAME_MODELS, "w") as f:
         f.write(filecontent)
 
     sm = read_model("STRINGMODEL1", tmpdir)
     assert sm.__dict__ == {'model': 'salut{name}', 'default': {'name': 24}, 'global_default': '12',
                            'sep': '_.', 'escape': '$', 'forbidden': ' ', 'replace': '%'}
+
+    print(sm._get_model_slots())
 
 
 def test_save(tmpdir):
@@ -78,3 +80,22 @@ def test_match_notok(string_model):
     assert not string_model.match("expliis_mtriambimutant_e90_p-p%smooth%0.6_n3_t49")
     # not ok, redo later
     assert not string_model.match("expliis_mtriambimutant_p90_s8_p-p%smooth%0.6_n3_t49")
+
+
+def test_match_param_ok(string_model):
+    assert string_model.match_param("expliis_mtriambimutant_e90_s8_p-p%smooth%0.6_n3_t49", dict(start=49))
+
+
+def test_match_param_notok(string_model):
+    assert not string_model.match_param("expliis_mtriambimutant_e90_s8_p-p%smooth%0.6_n3_t49", dict(start=48))
+
+
+def test_pick_last(string_model):
+    strings = [
+        "expliis_mtriambimutant_e90_s8_p-p%smooth%0.6_n3_t49",
+        "expliis_mtriambimutant_e90_s8_p-p%smooth%0.6_n4_t49",
+        "expliis_mtriambimutant_e90_s8_p-p%smooth%0.6_n2_t49",
+        "expliis_mtriambimutant_e90_s8_p-p%smooth%0.6_n5_t50",
+    ]
+    last = string_model.pick_last(strings, slot="sample", params=dict(start=49))
+    assert last == strings[1]

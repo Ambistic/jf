@@ -140,7 +140,8 @@ class O(_JFObject):
 
 
 class L(list, _JFObject):
-    pass
+    def __getattr__(self, item):
+        return L([getattr(x, item) for x in self])
 
 
 class P(ClassPath, _JFObject):

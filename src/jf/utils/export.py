@@ -44,3 +44,12 @@ class Exporter:
 
     def list(self):
         return os.listdir(self.path)
+
+    def touch(self, name):
+        (self.path / name).touch()
+
+    def exists(self, name):
+        return (self.path / name).exists()
+
+    def subtask(self, task_name):
+        return Exporter(path=self.path / task_name)

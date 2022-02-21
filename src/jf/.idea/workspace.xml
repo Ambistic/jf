@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="48ac8b27-a5bc-456f-bc42-a11e75522be8" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../../test/models/test_string_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/autocompute/jf.py" beforeDir="false" afterPath="$PROJECT_DIR$/autocompute/jf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/db/db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/objdb/objdb.py" beforeDir="false" afterPath="$PROJECT_DIR$/db/objdb/objdb.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/stringmodel.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/stringmodel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/helper.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/helper.py" afterDir="false" />
-    </list>
+    <list default="true" id="48ac8b27-a5bc-456f-bc42-a11e75522be8" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,6 +9,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="23KEm2TUGAWETgG1dSJymEqPewL" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />

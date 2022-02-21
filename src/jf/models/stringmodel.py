@@ -5,6 +5,9 @@ from configparser import ConfigParser
 from jf.utils.helper import nonestr
 
 
+_FILENAME_MODELS = ".string-model.conf"
+
+
 def _parse_substring(substring):
     pat = '([\w\d]+)(?:{([\w\d]+)})?'
     return re.findall(pat, substring)[0]
@@ -25,7 +28,7 @@ def cover_param(param):
 
 def read_model(name, dirname="."):
     conf = ConfigParser()
-    conf.read(P(dirname) / "stringmodel.conf")
+    conf.read(P(dirname) / _FILENAME_MODELS)
     kwargs = dict(conf[name])
     if "default" in kwargs:
         kwargs["default"] = json.loads(kwargs["default"])
@@ -52,7 +55,7 @@ class StringModel:
 
     def save(self, name, dirname="."):
         conf = ConfigParser()
-        conf.read(P(dirname) / "stringmodel.conf")
+        conf.read(P(dirname) / _FILENAME_MODELS)
         kwargs = dict(
             model=self.model,
             default=json.dumps(self.default),
@@ -67,7 +70,7 @@ class StringModel:
         # for k, v in kwargs.items():
         #     conf[name][k] = v
 
-        with open(P(dirname) / "stringmodel.conf", "w") as fp:
+        with open(P(dirname) / _FILENAME_MODELS, "w") as fp:
             conf.write(fp)
 
     def _split(self, string):
@@ -77,7 +80,7 @@ class StringModel:
         res += ['']
         return [res[i * 2] + nonestr(res[i * 2 + 1]) for i in range(size)]
 
-    def _get_slots(self):
+    def _get_model_slots(self):
         substrings = self._split(self.model)
         return [_parse_substring(substring) for substring in substrings]
 
@@ -89,7 +92,7 @@ class StringModel:
 
     def fill(self, **params):
         params = self._process_dict_strings(params)
-        values = {slotname: self.global_default for _, slotname in self._get_slots()}
+        values = {slotname: self.global_default for _, slotname in self._get_model_slots()}
         values.update(self.default)
         values.update(params)
         return self.model.format(**values)
@@ -99,7 +102,7 @@ class StringModel:
         return re.findall(pat, string)[0]
 
     def extract(self, string):
-        slots = self._get_slots()
+        slots = self._get_model_slots()
         substrings = self._split(string)
         assert len(slots) == len(substrings), f"Are you sure {string} matches the model"
         dict_res = dict()
@@ -112,7 +115,7 @@ class StringModel:
         return dict_res
 
     def extract_old(self, string):
-        slots = filter(lambda x: x[1] != "", self._get_slots())
+        slots = filter(lambda x: x[1] != "", self._get_model_slots())
         substrings = self._split(string)
         dict_res = dict()
         for prefix, slotname in slots:
@@ -122,8 +125,47 @@ class StringModel:
                     break
 
         return dict_res
-    
+
     def match(self, string):
-        slots = self._get_slots()
+        slots = self._get_model_slots()
         substrings = self._split(string)
-        return len(slots) == len(substrings)
+        if len(slots) != len(substrings):
+            return False
+
+        for (prefix, _), substring in zip(slots, substrings):
+            if not re.match(f"{prefix}.*", substring):
+                return False
+
+        return True
+    
+    def match_param(self, string, params):
+        """Do not check for the normal match"""
+        slots = self._get_model_slots()
+        substrings = self._split(string)
+        for (prefix, slotname), substring in zip(slots, substrings):
+            if slotname == "":
+                continue
+            if slotname in params:
+                string_value = re.findall(f"{prefix}(.*)", substring)[0]
+                if string_value != str(params[slotname]):
+                    return False
+
+        return True
+    
+    def pick_last(self, strings, slot, params=None):
+        last_number = -1
+        last = None
+        slots = self._get_model_slots()
+        
+        for string in strings:
+            if not self.match(string):
+                continue
+
+            if params is not None and not self.match_param(string, params):
+                continue
+
+            value = float(self.extract(string)[slot])
+            if value > last_number:
+                last, last_number = string, value
+
+        return last
