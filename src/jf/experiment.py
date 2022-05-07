@@ -87,7 +87,7 @@ class Experiment:
         """
         ls = list()
         for x in os.listdir(self.results_path):
-            ls.append(Path(x).stem)
+            ls.append(Path(x))
 
         return ls
 
