@@ -61,8 +61,8 @@ class Experiment:
     def _result_name(self, result_name):
         return self.results_path / result_name
 
-    def read_result(self, result_name, res_type="res"):
-        with open(self._result_name(result_name + "." + res_type), "r") as fp:
+    def read_result(self, result_name):
+        with open(self._result_name(result_name), "r") as fp:
             return json.load(fp)
 
     def save_result(self, results, result_name=None):
