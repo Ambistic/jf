@@ -4,6 +4,7 @@ experiments that are made with a modulation of parameters
 """
 import json
 from datetime import datetime
+import random
 import pandas as pd
 from pathlib import Path
 import os
