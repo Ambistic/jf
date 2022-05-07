@@ -122,6 +122,24 @@ class O(_JFObject):
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
+
+    def update(self, *args, **kwargs):
+        for obj in args:
+            if isinstance(obj, dict):
+                items = obj.items()
+            elif isinstance(obj, O):
+                items = obj.as_dict().items()
+            else:
+                raise TypeError(f"Unrecognized type {type(obj)}")
+
+            for k, v in items:
+                setattr(self, k, v)
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def as_dict(self):
+        return self.__dict__
             
     def _get_properties_as_dict(self):
         return {
