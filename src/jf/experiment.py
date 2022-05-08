@@ -49,6 +49,7 @@ class Experiment:
         self.results_path = self.path / "results"
         self.export_path = self.path / "export"
         self.log_path = self.path / "log"
+        self.progress_path = self.path / "progress"
 
         self.path.mkdir(parents=True, exist_ok=True)
         self.results_path.mkdir(parents=True, exist_ok=True)
@@ -129,3 +130,16 @@ class Experiment:
 
     def exists(self, name):
         return (self.export_path / name).exists()
+
+    def progress(self, x: int, name="default"):
+        with open(self.progress_path / name, "r+") as fd:
+            old = fd.read()
+            value = 0 if old == "" else int(old)
+            fd.seek(0)
+            fd.write(str(value + x))
+
+    def advancement(self, name="default"):
+        with open(self.progress_path / name, "r") as fd:
+            old = fd.read()
+            value = 0 if old == "" else int(old)
+        return value
