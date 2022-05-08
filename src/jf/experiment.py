@@ -9,9 +9,10 @@ import pandas as pd
 import pickle
 from pathlib import Path
 import os
+import sys
 
 
-def select(df, **kwargs):
+def df_filter(df, **kwargs):
     """
     Select rows where conditions are respected.
     Conditions are represented by `key == value` in the dataframe
@@ -94,7 +95,7 @@ class Experiment:
 
     def exists_result(self, **kwargs):
         df = self.dataframe()
-        res_df = select(df, **kwargs)
+        res_df = df_filter(df, **kwargs)
         return not res_df.empty
 
     def dataframe(self):
@@ -143,3 +144,7 @@ class Experiment:
             old = fd.read()
             value = 0 if old == "" else int(old)
         return value
+
+    def redirect(self):
+        sys.stdout = open(self.log_path / "stdout.txt", "w")
+        sys.stderr = open(self.log_path / "stderr.txt", "w")
