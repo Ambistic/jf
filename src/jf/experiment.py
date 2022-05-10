@@ -56,6 +56,7 @@ class Experiment:
         self.results_path.mkdir(parents=True, exist_ok=True)
         self.export_path.mkdir(parents=True, exist_ok=True)
         self.log_path.mkdir(parents=True, exist_ok=True)
+        self.progress_path.mkdir(parents=True, exist_ok=True)
 
         if not silent:
             print("Exporting at {}".format(self.path))
@@ -146,5 +147,10 @@ class Experiment:
         return value
 
     def redirect(self):
+        print("Redirecting outputs to stdout.txt and stderr.txt")
         sys.stdout = open(self.log_path / "stdout.txt", "w")
         sys.stderr = open(self.log_path / "stderr.txt", "w")
+
+    def show(self, name):
+        with open(self.log_path / name, "r") as fd:
+            print(fd.read())
