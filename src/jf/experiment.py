@@ -134,7 +134,8 @@ class Experiment:
         return (self.export_path / name).exists()
 
     def progress(self, x: int, name="default"):
-        with open(self.progress_path / name, "r+") as fd:
+        with open(self.progress_path / name, "a+") as fd:
+            fd.seek(0)
             old = fd.read()
             value = 0 if old == "" else int(old)
             fd.seek(0)
