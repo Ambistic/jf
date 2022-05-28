@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+from jf.dashboard.main import sidebar, main, init
+import argparse
+from pathlib import Path
+import streamlit as st
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--conf", type=Path, default="conf.jf")
+    args = parser.parse_args()
+
+    if "projects" not in st.session_state:
+        init(args.conf)
+    sidebar()
+    main()
