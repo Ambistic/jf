@@ -12,7 +12,7 @@ def init(conf_path):
 
 
 def sidebar():
-    with st.sidebar():
+    with st.sidebar:
         st.header("Select a project")
         r = st.radio("Projects", st.session_state["projects"])
 
