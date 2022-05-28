@@ -33,7 +33,7 @@ def main():
     # for each start (in the correct reversed order) if stop stop, if pid run, else crashed
 
     with open(current, "r") as f:
-        for line in f.readlines():
+        for line in f.read().split("\n"):
             el = json.loads(line)
             if el["status"] == "start":
                 starts.append(el)

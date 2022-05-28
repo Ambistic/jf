@@ -159,7 +159,7 @@ class Experiment:
     def __enter__(self):
         obj = dict(name=self.name, status="start", pid=os.getpid())
         run_msg = json.dumps(obj)
-        with open(self.path / "running.log", "a") as f:
+        with open(self.location / "running.log", "a") as f:
             f.write(run_msg)
 
         return self
@@ -167,5 +167,5 @@ class Experiment:
     def __exit__(self, exc_type, exc_val, exc_tb):
         obj = dict(name=self.name, status="end", pid=os.getpid())
         run_msg = json.dumps(obj)
-        with open(self.path / "running.log", "a") as f:
+        with open(self.location / "running.log", "a") as f:
             f.write(run_msg)
