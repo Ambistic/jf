@@ -8,7 +8,7 @@ import psutil
 def init(conf_path):
     with open(conf_path, "r") as f:
         lines = f.readlines()
-    st.session_state["projects"] = lines
+    st.session_state["projects"] = lines.strip()
 
 
 def sidebar():
