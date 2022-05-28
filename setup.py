@@ -6,8 +6,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setuptools.setup(
     name="jf",
     version="0.0.1",
-    author="Example Author",
-    author_email="author@example.com",
+    author="Nathan Vinçon",
+    author_email="nathan_v@hotmail.fr",
     description="A python toolbox for scientists",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -23,5 +23,6 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
-    install_requires=['pandas', 'networkx'],
+    install_requires=['pandas', 'networkx', 'streamlit'],
+    script=['bin/testscript']
 )

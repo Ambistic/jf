@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+
+import jf
+
+
+jf.init()
+print(jf.root())
