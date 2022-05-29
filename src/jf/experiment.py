@@ -160,7 +160,7 @@ class Experiment:
         obj = dict(name=self.name, status="start", pid=os.getpid())
         run_msg = json.dumps(obj)
         with open(self.location / "running.log", "a") as f:
-            f.write(run_msg)
+            print(run_msg, file=f)  # newline each time
 
         return self
 
@@ -168,4 +168,4 @@ class Experiment:
         obj = dict(name=self.name, status="end", pid=os.getpid())
         run_msg = json.dumps(obj)
         with open(self.location / "running.log", "a") as f:
-            f.write(run_msg)
+            print(run_msg, file=f)  # newline each time
