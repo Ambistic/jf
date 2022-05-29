@@ -35,7 +35,7 @@ def is_empty(line):
 def is_stopped(row, df):
     return not df[
         (df.pid == row.pid)
-        & (df.name == row.name)
+        & (df["name"] == row["name"])
         & (df.status == "end")
     ].empty
 
@@ -43,7 +43,7 @@ def is_stopped(row, df):
 def is_crashed(row, df):
     return not df[
         (df.pid == row.pid)
-        & (df.name == row.name)
+        & (df["name"] == row["name"])
         & (df.status == "crash")
     ].empty
 
