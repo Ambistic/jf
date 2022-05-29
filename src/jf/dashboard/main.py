@@ -21,19 +21,22 @@ def sidebar():
                 st.session_state["current"] = proj
 
 
+def is_empty(line):
+    return len(line) == 0
+
+
 def main():
     current = st.session_state.get("current")
     if current is None:
         return
 
-    # read all starts
     starts = []
     stops = []
-    # read all stops
-    # for each start (in the correct reversed order) if stop stop, if pid run, else crashed
 
     with open(current, "r") as f:
         for line in f.read().split("\n"):
+            if is_empty(line):
+                continue
             el = json.loads(line)
             if el["status"] == "start":
                 starts.append(el)
