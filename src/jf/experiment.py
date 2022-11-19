@@ -35,7 +35,8 @@ class Experiment:
     _EXP_FILE_NAME = ".experiment"
     _DATE_KEY = "date_of_experiment"
 
-    def __init__(self, name, location="output", silent=False, copy_stdout=False):
+    def __init__(self, name, location="output", silent=False, copy_stdout=False,
+                 redirect=True):
         """
         location can be local or centralized (ie to /var/nas/log)
         An experiment is a directory
@@ -45,6 +46,7 @@ class Experiment:
         self.copy_stdout = copy_stdout
         self.key = str(random.randint(0, 1000000))
         self.location = Path(location)
+        self._redirect = redirect
 
         self.path = self.location / name
         self.results_path = self.path / "results"
@@ -102,8 +104,11 @@ class Experiment:
     def dataframe(self):
         df = pd.DataFrame()
         for x in self.list_results():
-            res = self.read_result(x)
-            df = df.append(pd.Series(res, name=x))
+            try:
+                res = self.read_result(x)
+                df = df.append(pd.Series(res, name=x))
+            except Exception as e:
+                print(f"Found exception {e}")
         return df
 
     def export(self, obj, name):
