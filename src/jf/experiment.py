@@ -103,13 +103,14 @@ class Experiment:
 
     def dataframe(self):
         df = pd.DataFrame()
+        series = []
         for x in self.list_results():
             try:
                 res = self.read_result(x)
-                df = df.append(pd.Series(res, name=x))
+                series.append(pd.Series(res, name=x))
             except Exception as e:
                 print(f"Found exception {e}")
-        return df
+        return pd.concat(series)
 
     def export(self, obj, name):
         with open(self.export_path / name, "wb") as fd:
