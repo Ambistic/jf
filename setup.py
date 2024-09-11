@@ -23,6 +23,6 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
-    install_requires=['pandas', 'networkx', 'streamlit'],
+    install_requires=['pandas', 'networkx', 'streamlit', 'discord.py'],
     scripts=['bin/jf_watch']
 )
