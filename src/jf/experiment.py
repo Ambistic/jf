@@ -112,7 +112,7 @@ class Experiment:
                 print(f"Found exception {e}")
         if len(series) == 0:
             return pd.DataFrame()
-        return pd.concat(series)
+        return pd.concat(series, ignore_index=True)
 
     def export(self, obj, name):
         with open(self.export_path / name, "wb") as fd:
