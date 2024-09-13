@@ -110,6 +110,8 @@ class Experiment:
                 series.append(pd.Series(res, name=x))
             except Exception as e:
                 print(f"Found exception {e}")
+        if len(series) == 0:
+            return pd.DataFrame()
         return pd.concat(series)
 
     def export(self, obj, name):
